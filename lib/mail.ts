@@ -326,3 +326,25 @@ export async function sendCustomerQuoteConfirmation(data: QuoteMailPayload): Pro
 export async function sendQuoteBookingEmails(data: QuoteMailPayload): Promise<void> {
   await Promise.all([sendAdminQuoteNotification(data), sendCustomerQuoteConfirmation(data)]);
 }
+
+export async function sendCustomEmail({
+  to,
+  subject,
+  body,
+}: {
+  to: string;
+  subject: string;
+  body: string;
+}): Promise<void> {
+  const transporter = createTransporter();
+  const from = getMailFrom();
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject,
+    text: body,
+    html: body.replace(/\n/g, "<br/>"),
+  });
+}
+

@@ -30,6 +30,8 @@ model Booking {
   adminNote      String?
   statusUpdatedAt DateTime?
   createdAt  DateTime @default(now())
+  reminderSent Boolean @default(false)
+  emails     LeadEmail[]
 }
 
 model GalleryCategory {
@@ -48,4 +50,17 @@ model Gallery {
   categoryId   String
   createdAt    DateTime        @default(now())
   category     GalleryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model LeadEmail {
+  id         String   @id @default(cuid())
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  direction  String   // "SENT" or "RECEIVED"
+  subject    String
+  body       String
+  from       String
+  to         String
+  messageId  String?  @unique
+  createdAt  DateTime @default(now())
 }

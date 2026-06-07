@@ -70,6 +70,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
         nextFollowUpAt: followUpAt,
         adminNote: normalizedNote || null,
         statusUpdatedAt: new Date(),
+        reminderSent: false,
       },
     });
 

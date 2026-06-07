@@ -7,6 +7,7 @@ import Testimonials from "./Testimonials";
 import FAQSection from "./FAQSection";
 import OperationalCities from "./OperationalCities";
 import CallToAction from "./CallToAction";
+import NationalCoverageMap from "./NationalCoverageMap";
 import { operationalCities } from "@/lib/operational-cities";
 // import AboutCompany from "./AboutCompany";
 
@@ -26,6 +27,7 @@ export default function HomeSections() {
         cities={operationalCities}
       />
       <CallToAction />
+      <NationalCoverageMap />
     </>
   );
 }
