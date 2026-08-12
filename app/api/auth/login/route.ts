@@ -15,7 +15,8 @@ const ENV_ADMIN_LOGIN_ID = process.env.ADMIN_LOGIN_ID?.trim() ?? "Admin";
 const ENV_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "Admin123";
 
 async function authenticateEnvAdmin(loginId: string, password: string) {
-  if (loginId !== ENV_ADMIN_LOGIN_ID || password !== ENV_ADMIN_PASSWORD) {
+  // Case-insensitive comparison for loginId
+  if (loginId.toLowerCase() !== ENV_ADMIN_LOGIN_ID.toLowerCase() || password !== ENV_ADMIN_PASSWORD) {
     return null;
   }
 
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
 
     const valid = await bcrypt.compare(password, admin.password);
     if (!valid) {
-      if (loginId === ENV_ADMIN_LOGIN_ID && password === ENV_ADMIN_PASSWORD) {
+      if (loginId.toLowerCase() === ENV_ADMIN_LOGIN_ID.toLowerCase() && password === ENV_ADMIN_PASSWORD) {
         admin = await authenticateEnvAdmin(loginId, password);
       } else {
         return jsonError("Invalid login ID or password", 401);
