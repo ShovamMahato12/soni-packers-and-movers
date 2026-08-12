@@ -43,35 +43,43 @@ export async function POST(request: Request) {
     const loginId = parsed.data.loginId.trim();
     const password = parsed.data.password;
 
-    let admin = await prisma.admin.findUnique({
-      where: { loginId },
+    // First, check if credentials match environment variables
+    if (loginId.toLowerCase() === ENV_ADMIN_LOGIN_ID.toLowerCase() && password === ENV_ADMIN_PASSWORD) {
+      const admin = await authenticateEnvAdmin(loginId, password);
+      if (admin) {
+        await setSessionCookie({ adminId: admin.id, loginId: admin.loginId });
+        const response = jsonSuccess({ loginId: admin.loginId });
+        return applyNoStoreHeaders(response);
+      }
+    }
+
+    // If not env credentials, try to find in database with case-insensitive lookup
+    const admins = await prisma.admin.findMany({
+      where: {
+        loginId: {
+          equals: loginId,
+          mode: "insensitive",
+        },
+      },
     });
 
-    if (!admin) {
-      admin = await authenticateEnvAdmin(loginId, password);
-      if (!admin) {
-        return jsonError("Invalid login ID or password", 401);
-      }
-    }
-
-    const valid = await bcrypt.compare(password, admin.password);
-    if (!valid) {
-      if (loginId.toLowerCase() === ENV_ADMIN_LOGIN_ID.toLowerCase() && password === ENV_ADMIN_PASSWORD) {
-        admin = await authenticateEnvAdmin(loginId, password);
-      } else {
-        return jsonError("Invalid login ID or password", 401);
-      }
-    }
+    let admin = admins.length > 0 ? admins[0] : null;
 
     if (!admin) {
       return jsonError("Invalid login ID or password", 401);
     }
 
-    await setSessionCookie({ adminId: admin.id, loginId: admin.loginId });
+    // Verify password against database record
+    const valid = await bcrypt.compare(password, admin.password);
+    if (!valid) {
+      return jsonError("Invalid login ID or password", 401);
+    }
 
+    await setSessionCookie({ adminId: admin.id, loginId: admin.loginId });
     const response = jsonSuccess({ loginId: admin.loginId });
     return applyNoStoreHeaders(response);
-  } catch {
+  } catch (error) {
+    console.error("Login error:", error);
     return jsonError("Login failed", 500);
   }
 }
