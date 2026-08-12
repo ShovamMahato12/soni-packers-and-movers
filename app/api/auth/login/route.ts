@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { applyNoStoreHeaders, setSessionCookie } from "@/lib/auth";
@@ -63,7 +62,7 @@ export async function POST(request: Request) {
       },
     });
 
-    let admin = admins.length > 0 ? admins[0] : null;
+    const admin = admins.length > 0 ? admins[0] : null;
 
     if (!admin) {
       return jsonError("Invalid login ID or password", 401);
