@@ -12,22 +12,14 @@ const loginSchema = z.object({
 
 const ENV_ADMIN_LOGIN_ID = process.env.ADMIN_LOGIN_ID?.trim() ?? "Admin";
 const ENV_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "Admin123";
+const ENV_ADMIN_ID = "environment-admin";
 
 async function authenticateEnvAdmin(loginId: string, password: string) {
-  // Case-insensitive comparison for loginId
   if (loginId.toLowerCase() !== ENV_ADMIN_LOGIN_ID.toLowerCase() || password !== ENV_ADMIN_PASSWORD) {
     return null;
   }
 
-  const hashedPassword = await bcrypt.hash(ENV_ADMIN_PASSWORD, 12);
-
-  const admin = await prisma.admin.upsert({
-    where: { loginId: ENV_ADMIN_LOGIN_ID },
-    update: { password: hashedPassword },
-    create: { loginId: ENV_ADMIN_LOGIN_ID, password: hashedPassword },
-  });
-
-  return admin;
+  return { id: ENV_ADMIN_ID, loginId: ENV_ADMIN_LOGIN_ID };
 }
 
 export async function POST(request: Request) {
