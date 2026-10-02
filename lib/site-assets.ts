@@ -12,12 +12,15 @@
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BASE_URL ?? "").replace(/\/$/, "");
 
-const assetsUrl = (path: string) => `${BASE_URL}${path}`;
+const assetsUrl = (path: string, fallback?: string) => {
+  if (BASE_URL) return `${BASE_URL}${path}`;
+  return fallback ?? path;
+};
 
 export const siteAssets = {
   branding: {
     /** Main website logo used in the navbar brand and footer brand areas. */
-    main: assetsUrl("/assets/logo/logo.png"),
+    main: assetsUrl("/assets/logo/logo.png", "/media/logo.png"),
   },
 
   pages: {
@@ -292,7 +295,7 @@ export const siteAssets = {
 
   external: {
     /** Alternate older Supabase-style alias kept for legacy code paths that still read the logo as a string. */
-    logo: assetsUrl("/assets/logo/logo.png"),
+    logo: assetsUrl("/assets/logo/logo.png", "/media/logo.png"),
 
     /** Legacy flat alias for the household service banner used by older imports. */
     servicehousebanner: assetsUrl("/assets/services/household/service-house-bg.avif"),
@@ -320,7 +323,7 @@ export const siteAssets = {
   },
 
   /** Flat alias preserved so existing imports like `siteAssets.logo` keep working. */
-  logo: assetsUrl("/assets/logo/logo.png"),
+  logo: assetsUrl("/assets/logo/logo.png", "/media/logo.png"),
 
   /** Flat alias preserved for older components that still read the household banner directly. */
   servicehousebanner: assetsUrl("/assets/services/household/service-house-bg.avif"),
